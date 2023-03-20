@@ -1,0 +1,46 @@
+.legoMain {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+.container {
+    margin-bottom: 10px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+}
+.titleBox {
+    font-size: 16px;
+}
+.title {
+    margin-left: 10px;
+    font-weight: bold;
+}
+.addButton {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.flexSpace {
+    display: flex;
+    justify-content: space-between;
+}
+.field {
+    border: 1px solid #f0f0f0;
+    cursor: pointer;
+    background: #f6f7fb;
+    text-align: center;
+    border-radius: 9px;
+    margin-bottom: 10px;
+    .fieldCode {
+        height: 40px;
+        line-height: 40px;
+    }
+}
+.delIcon {
+    position: absolute;
+    top: 7px;
+    right: 21px;
+    cursor: pointer;
+}

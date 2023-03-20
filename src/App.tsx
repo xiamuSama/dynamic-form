@@ -1,13 +1,17 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { Button } from "antd";
 import "./App.css";
-import DynamicForm, {
+import {
+  DynamicForm,
   IDynamicFormApi,
   updateSchemaFieldHook,
 } from "./DynamicForm";
+import Edit from "./Lego/Edit";
 
 function App() {
   const formRef = useRef<IDynamicFormApi>(null);
+
+  useEffect(() => {}, []);
 
   const handleClick = useCallback(() => {
     formRef.current?.getFieldsValue().then((values) => {
@@ -155,6 +159,8 @@ function App() {
         }}
       />
       <Button onClick={handleClick}>获取数据</Button>
+      <hr />
+      <Edit />
     </div>
   );
 }

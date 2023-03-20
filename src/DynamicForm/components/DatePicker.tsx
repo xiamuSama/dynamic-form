@@ -1,14 +1,56 @@
-import React from 'react';
-import { DatePicker, DatePickerProps } from 'antd';
+import React, { useCallback, useMemo } from 'react';
+import { DatePicker } from 'antd';
 const { RangePicker } = DatePicker;
-// import moment from 'moment';
+import moment from 'moment';
 
-const DatePickerWrapper = ({ format }: DatePickerProps) => {
-    return <DatePicker style={{ width: '100%' }} format={format || 'YYYY-MM-DD'} />;
+const DatePickerWrapper = ({ format, value, onChange, ...others }) => {
+    const valueMemo = useMemo(() => {
+        if (!value) {
+            return undefined;
+        }
+        return moment(value);
+    }, [value]);
+
+    const handleChange = useCallback(
+        val => {
+            if (val) {
+                const formatedValue = moment(val).format(format || 'YYYY-MM-DD');
+                onChange(formatedValue);
+                return;
+            }
+            onChange(undefined);
+        },
+        [format]
+    );
+
+    return <DatePicker value={valueMemo} style={{ width: '100%' }} format={format || 'YYYY-MM-DD'} onChange={handleChange} {...others} />;
 };
 
-const RangePickerWrapper = ({ format }: DatePickerProps) => {
-    return <RangePicker style={{ width: '100%' }} format={format || 'YYYY-MM-DD'} />;
+const RangePickerWrapper = ({ format, rangeFormat, value, onChange, ...others }) => {
+    const valueMemo = useMemo(() => {
+        if (!value || value.length !== 2) {
+            return undefined;
+        }
+        const [a, b] = value;
+        return [moment(a), moment(b)];
+    }, [value]);
+
+    const handleChange = useCallback(
+        val => {
+            if (val) {
+                const [a, b] = val;
+                const start = moment(a).format(format || 'YYYY-MM-DD');
+                const end = moment(b).format(format || 'YYYY-MM-DD');
+
+                onChange([start, end]);
+                return;
+            }
+            onChange(undefined);
+        },
+        [format]
+    );
+
+    return <RangePicker value={valueMemo as any} style={{ width: '100%' }} format={format || 'YYYY-MM-DD'} onChange={handleChange} {...others} />;
 };
 
 export { DatePickerWrapper, RangePickerWrapper };
