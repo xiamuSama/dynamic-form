@@ -1,28 +1,33 @@
 import { ReactNode } from 'react';
 import { ComponentEnum } from '../types';
-import { Input, InputNumber, FormItemProps } from 'antd';
-import getCustomComponent from './Custom';
+import { Input, FormItemProps } from 'antd';
+import { getCustomComponent } from './Custom';
 import ErrorText from './Error';
-// import { InputWrapper, InputNumberWrapper } from './Input';
+import { InputNumberWrapper } from './Input';
 import SelectWraper from './Select';
 import { DatePickerWrapper, RangePickerWrapper } from './DatePicker';
 import SwitchWrapper from './Switch';
 import RadioWrapper from './Radio';
+import CheckboxWrapper from './CheckBox';
+import UploadImageMultiple from './UploadImageMultiple';
 
 const { TextArea } = Input;
 
 const componentMap: {
     [key in ComponentEnum]: ReactNode;
 } = {
+    // todos: input系列暂时没有二次封装的用途,直接用antd的内置, 后面再拓展
     // 内置通用
     Input,
-    InputNumber,
+    InputNumber: InputNumberWrapper,
     Select: SelectWraper,
     DatePicker: DatePickerWrapper,
     RangePicker: RangePickerWrapper,
     TextArea,
     Switch: SwitchWrapper,
     Radio: RadioWrapper,
+    Checkbox: CheckboxWrapper,
+    UploadImageMultiple,
     // 自定义拓展的业务组件
     Custom: ErrorText,
 };
@@ -60,6 +65,7 @@ export const getDefaultRequiredMsg = (component: ComponentEnum, label: string) =
         case 'Select':
         case 'Radio':
         case 'Switch':
+        case 'UploadImageMultiple':
             return `请选择${label}`;
         default:
             return undefined;

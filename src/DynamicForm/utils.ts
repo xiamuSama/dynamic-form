@@ -1,10 +1,11 @@
 import { PageConfig, ISchemeInit, IDynamicFormProps, TEnumItem, IFieldConfig, BlockConfig } from './types';
 import { cloneDeep } from 'lodash';
+import { registerComponent, unmountCustomCompoent } from './components/Custom';
 
 // tools
 export const formatSchemaInit: (schema: PageConfig) => ISchemeInit = schema => {
     const newSchema: PageConfig = cloneDeep(schema);
-    const { scene, blocks = [], header, footer } = newSchema || {};
+    const { scene, blocks = [], wrapCol } = newSchema || {};
     const defaultValue = {};
     const filteredBlocks = [] as BlockConfig[];
     const fields = [] as IFieldConfig[];
@@ -14,13 +15,15 @@ export const formatSchemaInit: (schema: PageConfig) => ISchemeInit = schema => {
         if (block.visible !== false) {
             filteredBlocks.push(block);
         }
+
         block.fields?.forEach(field => {
             fields.push(field);
             // if (field.show !== false) {
             //     filteredFields.push(field);
             // }
             if (typeof field.defaultValue !== 'undefined') {
-                defaultValue[field.code] = field.defaultValue;
+                const valueKey = block.independentModel ? `${block.code}.${field.code}` : field.code;
+                defaultValue[valueKey] = field.defaultValue;
             }
         });
     });
@@ -39,9 +42,37 @@ export const formatSchemaInit: (schema: PageConfig) => ISchemeInit = schema => {
         fields,
         // filteredFields,
         defaultValue,
-        header,
-        footer,
+
+        wrapCol,
     };
+};
+
+/**
+ *
+ * 根据wrapCol将blocks分类
+ */
+export const getWrapColBlocks = (
+    wrapCol: (12 | 24)[],
+    blocks: BlockConfig[]
+): {
+    col: 12 | 24;
+    blocks: BlockConfig[];
+}[] => {
+    const rList = wrapCol[wrapCol.length - 1] === 24 ? [...wrapCol] : [...wrapCol, 24];
+    const wrapColBlocks: any = rList.map(v => ({ col: v, blocks: [] }));
+
+    blocks.forEach(block => {
+        const { wrapColIndex } = block;
+        if (typeof wrapColIndex !== 'undefined' && wrapColBlocks[wrapColIndex]) {
+            wrapColBlocks[wrapColIndex].blocks.push(block);
+            return;
+        } else {
+            // 没匹配到统一都丢到最后
+            wrapColBlocks[wrapColBlocks.length - 1].blocks.push(block);
+        }
+    });
+
+    return wrapColBlocks;
 };
 
 export const initEnums = async (
@@ -69,8 +100,23 @@ export const initEnums = async (
     return res;
 };
 // change出去的字段统一处理
-export const formatedOutFormValue = (value = {}, fields: IFieldConfig[]) => {
-    const formatedValue = { ...value };
+export const formatedOutFormValue = (value = {}, fields?: IFieldConfig[]) => {
+    const formatedValue = cloneDeep(value);
+
+    Object.keys(formatedValue).forEach(key => {
+        if (key) {
+            // 独立模型的深度数据处理,形如{blockCode}.{fieldCode}
+            const [blockCode, fieldCode] = key.split('.');
+            // 深度1
+            if (blockCode && fieldCode) {
+                if (!formatedValue[blockCode]) {
+                    formatedValue[blockCode] = {};
+                }
+                formatedValue[blockCode][fieldCode] = formatedValue[key];
+                delete formatedValue[key];
+            }
+        }
+    });
 
     // fields.forEach(v => {
     //     const itemValue = formatedValue[v.code];
@@ -94,8 +140,22 @@ export const formatedOutFormValue = (value = {}, fields: IFieldConfig[]) => {
 };
 
 // 塞进表单字段统一处理
-export const formatedInFormValue = (value = {}, fields: IFieldConfig[]) => {
-    const formatedValue = { ...value };
+export const formatedInFormValue = (value = {}, blocks: BlockConfig[]) => {
+    const formatedValue = cloneDeep(value);
+
+    Object.keys(formatedValue).forEach(key => {
+        // 独立模型的深度数据拍平处理,拍成{blockCode}.{fieldCode}
+        const val = formatedValue[key];
+        if (Object.prototype.toString.call(val) === '[object Object]') {
+            const findBlock = blocks.find(v => v.code === key);
+            if (findBlock && findBlock.independentModel) {
+                Object.keys(val).forEach(item => {
+                    formatedValue[`${key}.${item}`] = val[item];
+                });
+                delete formatedValue[key];
+            }
+        }
+    });
 
     // fields.forEach(v => {
     //     const itemValue = formatedValue[v.code];
@@ -205,3 +265,5 @@ export const updateSchemaBlockHook = (schema: PageConfig, rule: string, value: a
         }
     });
 };
+
+export { registerComponent, unmountCustomCompoent };
