@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import { Button } from "antd";
 import "./App.css";
-import {
-  DynamicForm,
-  IDynamicFormApi,
-  updateSchemaFieldHook,
-} from "./DynamicForm";
+
+
+import DynamicForm from './DynamicForm/Form'
+import { IDynamicFormApi } from './DynamicForm/types'
+import { updateSchemaFieldHook } from './DynamicForm/utils'
+
 import Edit from "./Lego/Edit";
 
 function App() {
@@ -41,19 +42,30 @@ function App() {
           const checkedItem = data[name];
           if (name === "name") {
             data.remark = checkedItem;
+            return {
+              data,
+              schema,
+              doUpdate: true,
+              doReload: false,
+            };
           }
           if (name === "hobbys") {
             updateSchemaFieldHook(
               schema,
-              "baseInfo.display.show",
-              !checkedItem
+              [{rule:"baseInfo.display.show", value: !checkedItem}]
+              
             );
+            return {
+              data,
+              schema,
+              doUpdate: false,
+              doReload: true,
+            };
           }
           return {
             data,
             schema,
-            doUpdate: true,
-            doReload: true,
+           
           };
         }}
         schema={{

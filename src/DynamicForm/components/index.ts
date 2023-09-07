@@ -9,7 +9,6 @@ import { DatePickerWrapper, RangePickerWrapper } from './DatePicker';
 import SwitchWrapper from './Switch';
 import RadioWrapper from './Radio';
 import CheckboxWrapper from './CheckBox';
-import UploadImageMultiple from './UploadImageMultiple';
 
 const { TextArea } = Input;
 
@@ -27,7 +26,6 @@ const componentMap: {
     Switch: SwitchWrapper,
     Radio: RadioWrapper,
     Checkbox: CheckboxWrapper,
-    UploadImageMultiple,
     // 自定义拓展的业务组件
     Custom: ErrorText,
 };

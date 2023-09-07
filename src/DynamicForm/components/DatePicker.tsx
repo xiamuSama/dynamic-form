@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import { DatePicker } from 'antd';
-const { RangePicker } = DatePicker;
 import moment from 'moment';
+
+const { RangePicker } = DatePicker;
 
 const DatePickerWrapper = ({ format, value, onChange, ...others }) => {
     const valueMemo = useMemo(() => {

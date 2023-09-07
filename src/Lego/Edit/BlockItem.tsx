@@ -192,8 +192,8 @@ const BlockItem = ({ config, setBlocks, queque, blockLength }: IProps) => {
 
               <CloseOutlined
                 className={"delIcon"}
-                onClick={(e) => {
-                  e?.stopPropagation;
+                onClick={(e:any) => {
+                  e.stopPropagation();
                   changeField("del", index);
                 }}
               />
